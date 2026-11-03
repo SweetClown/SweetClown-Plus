@@ -1,0 +1,238 @@
+package com.sweetclown.builder;
+
+import com.mysql.cj.xdevapi.Table;
+import com.sweetclown.bean.Constants;
+import com.sweetclown.bean.FieldInfo;
+import com.sweetclown.bean.TableInfo;
+import com.sweetclown.utils.JsonUtils;
+import com.sweetclown.utils.StringUtils;
+import com.sweetclown.utils.YamlConfigUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.tomcat.util.bcel.Const;
+import org.slf4j.ILoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class BuildTable {
+
+    private static final Logger logger = LoggerFactory.getLogger(BuildTable.class);
+    private static Connection connection = null;
+    private static String SQL_SHOW_TABLE_STATUS = "show table status";
+    private static String SQL_SHOW_FULL_FIELDS_TABLE = "show full FIELDS from %s";
+    private static String SQL_SHOW_TABLE_INDEX = "show index from %s";
+
+    static {
+        String driverName = YamlConfigUtils.getString("spring.datasource.driver-class-name");
+        String url = YamlConfigUtils.getString("spring.datasource.url");
+        String account = YamlConfigUtils.getString("spring.datasource.username");
+        String password = YamlConfigUtils.getString("spring.datasource.password");
+        try {
+            Class.forName(driverName);
+            connection = DriverManager.getConnection(url, account, password);
+        } catch (Exception e) {
+            logger.error("Database Connection Failed", e);
+        }
+    }
+
+    public static List<TableInfo> getTables() {
+        PreparedStatement ps = null;
+        ResultSet tableResult = null;
+        try {
+            ps = connection.prepareStatement(SQL_SHOW_TABLE_STATUS);
+            tableResult = ps.executeQuery();
+            List<TableInfo> tableInfoList = new ArrayList();
+            while (tableResult.next()) {
+                String tableName = tableResult.getString("Name");
+                String comment = tableResult.getString("Comment");
+                TableInfo tableInfo = new TableInfo();
+                String beanName = tableName;
+
+                if (Constants.IGNORE_TABLE_PERFIX == true) {
+                    beanName = tableName.substring(beanName.indexOf("_") + 1);
+                }
+
+                beanName = processFiled(beanName, true);
+                tableInfo.setTableName(tableName);
+                tableInfo.setBeanName(beanName);
+                tableInfo.setComment(comment);
+                tableInfo.setBeanParamName(beanName + Constants.SUFFIX_BEAN_PARAM);
+
+                readFieldInfo(tableInfo);
+                getKeyIndexInfo(tableInfo);
+                tableInfoList.add(tableInfo);
+            }
+        return tableInfoList;
+        } catch (Exception e) {
+            logger.error("Read Table Fail", e);
+            throw new RuntimeException("Read Table Fail");
+        } finally {
+            if (tableResult != null) {
+                try {
+                    tableResult.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (connection != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+
+    private static void readFieldInfo(TableInfo tableInfo) {
+        PreparedStatement ps = null;
+        ResultSet fieldResult = null;
+        List<FieldInfo> fieldInfoList = new ArrayList();
+        try {
+            ps = connection.prepareStatement(String.format(SQL_SHOW_FULL_FIELDS_TABLE, tableInfo.getTableName()));
+            fieldResult = ps.executeQuery();
+            Boolean haveDateTime = false;
+            Boolean haveDate = false;
+            Boolean haveBigDecimal = false;
+            while (fieldResult.next()) {
+                String field = fieldResult.getString("Field");
+                String type = fieldResult.getString("Type");
+                String extra = fieldResult.getString("extra");
+                String comment = fieldResult.getString("comment");
+                if (type.indexOf("(") > 0) {
+                    type = type.substring(0, type.indexOf("("));
+                }
+                String propertyName = processFiled(field, false);
+                FieldInfo fieldInfo = new FieldInfo();
+                fieldInfoList.add(fieldInfo);
+                fieldInfo.setFieldName(field);
+                fieldInfo.setComment(comment);
+                fieldInfo.setSqlType(type);
+                fieldInfo.setAutoIncrement("auto_increment".equalsIgnoreCase(extra) ? true : false);
+                fieldInfo.setPropertyName(propertyName);
+                fieldInfo.setJavaType(processJavaType(type));
+
+                if (ArrayUtils.contains(Constants.SQL_DATE_TIME_TYPES, type)) {
+                    haveDateTime = true;
+                }
+                if (ArrayUtils.contains(Constants.SQL_DATE_TYPES, type)) {
+                    haveDate = true;
+                }
+                if (ArrayUtils.contains(Constants.SQL_DECIMAL_TYPES, type)) {
+                    haveBigDecimal = true;
+                }
+            }
+            tableInfo.setHaveDateTime(haveDateTime);
+            tableInfo.setHaveDate(haveDate);
+            tableInfo.setHaveBigDecimal(haveBigDecimal);
+            tableInfo.setFieldList(fieldInfoList);
+        } catch (Exception e) {
+            logger.error("Read Field Fail", e);
+        } finally {
+            if (fieldResult != null) {
+                try {
+                    fieldResult.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+
+    private static List<FieldInfo> getKeyIndexInfo(TableInfo tableInfo) {
+        PreparedStatement ps = null;
+        ResultSet fieldResult = null;
+        List<FieldInfo> fieldInfoList = new ArrayList();
+        try {
+
+            Map<String, FieldInfo> tempMap = new ConcurrentHashMap<>();
+            for (FieldInfo fieldInfo : tableInfo.getFieldList()){
+                tempMap.put(fieldInfo.getFieldName(), fieldInfo);
+            }
+
+            ps = connection.prepareStatement(String.format(SQL_SHOW_TABLE_INDEX, tableInfo.getTableName()));
+            fieldResult = ps.executeQuery();
+            while (fieldResult.next()) {
+                String keyName = fieldResult.getString("key_name");
+                Integer nonUnique = fieldResult.getInt("non_unique");
+                String columnName = fieldResult.getString("column_name");
+                if (nonUnique == 1) {
+                    continue;
+                }
+                List<FieldInfo> keyFieldList = tableInfo.getKeyIndexMap().get(keyName);
+                if (null == keyFieldList)  {
+                    keyFieldList = new ArrayList<>();
+                    tableInfo.getKeyIndexMap().put(keyName, keyFieldList);
+                }
+                keyFieldList.add(tempMap.get(columnName));
+            }
+        } catch (Exception e) {
+            logger.error("Read Index Fail", e);
+        } finally {
+            if (fieldResult != null) {
+                try {
+                    fieldResult.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return fieldInfoList;
+    }
+
+    private static String processFiled(String field, Boolean upperCaseFirstLetter) {
+        StringBuilder sb = new StringBuilder();
+        String[] fields = field.split("_");
+        sb.append(upperCaseFirstLetter ? StringUtils.upperCaseFirstLetter(fields[0]) : fields[0]);
+        for (int i = 1; i < fields.length; i++) {
+            sb.append(StringUtils.upperCaseFirstLetter(fields[i]));
+        }
+        return sb.toString();
+    }
+
+    private static String processJavaType(String type) {
+
+        if(ArrayUtils.contains(Constants.SQL_INTEGER_TYPES, type)) {
+            return "Integer";
+        } else if (ArrayUtils.contains(Constants.SQL_LONG_TYPES, type)) {
+            return  "Long";
+        } else if (ArrayUtils.contains(Constants.SQL_STRING_TYPES, type)) {
+            return "String";
+        } else if (ArrayUtils.contains(Constants.SQL_DATE_TIME_TYPES,type) || ArrayUtils.contains(Constants.SQL_DATE_TYPES,type)) {
+            return "Date";
+        } else if (ArrayUtils.contains(Constants.SQL_DECIMAL_TYPES, type)) {
+            return "BigDecimal";
+        } else {
+            throw new RuntimeException("Cannot Identify type :" + type);
+        }
+
+    }
+
+}

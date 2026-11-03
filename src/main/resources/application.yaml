@@ -1,0 +1,72 @@
+spring:
+  application:
+    # 應用程式名稱
+    name: SweetClown-Plus
+  datasource:
+    # MySQL 驅動程式類別（適用於 MySQL 8.0 以上版本）
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 資料庫連線 URL（包含時區 GMT+8、UTF-8 編碼、自動重連與停用 SSL 設定）
+    url: jdbc:mysql://localhost:3306/demo_software?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&autoReconnect=true&useSSL=false&useInformationSchema=true&nullCatalogMeansCurrent=true
+    # 資料庫登入帳號
+    username: root
+    # 資料庫登入密碼
+    password: Zxcfrtg12!
+    # HikariCP 連線池詳細配置
+    hikari:
+      # 連線池中維護的最小閒置連線數
+      minimum-idle: 5
+      # 連線池允許的最大連線數
+      maximum-pool-size: 15
+      # 連線允許閒置的最長時間（毫秒），超過將被釋放（30秒）
+      idle-timeout: 30000
+      # 一個連線在池中的最大生命週期（毫秒）（30分鐘）
+      max-lifetime: 1800000
+      # 等待借出連線的最大超時時間（毫秒）（30秒）
+      connection-timeout: 30000
+server:
+  # 伺服器啟動的連接埠 (Port)
+  port: 8070
+  servlet:
+    # 應用程式的基礎上下文路徑（所有 API 的前綴，例如 /api/user）
+    context-path: /api
+
+# 以下為代碼生成器 (Code Generator) 的自定義配置
+ignore:
+  table:
+    # 是否自動忽略/切除資料庫表名的前綴詞（例如 t_user 轉為 User 類別）
+    prefix: true
+  beam:
+    toJson:
+      filed: companyId, status
+      expression: '@JsonIgnore'
+      class: import com.fasterxml.jackson.annotation.JsonIgnore
+
+bean:
+  date:
+    unformat:
+      expression: '@DateTimeFormat(pattern = "%s")'
+      class: import org.springframework.format.annoation.DateTimeFormat
+    format:
+      expression: '@JsonFormat(pattern = "%s", timezone = "GMT+8")'
+      class: import com.fasterxml.jackson.annotation.JsonFormat
+
+suffix:
+  bean:
+    # 查詢參數物件 (DTO/Param) 的類別名稱後綴（例如 UserQuery）
+    param: Query
+
+path:
+  # 生成的原始碼檔案要輸出的本機檔案系統絕對路徑
+  base: D:/CodeResource/Test/src/main
+
+package:
+  # Java 專案的基礎套件路徑 (Base Package)
+  base: com.test
+  # 持久化實體物件 (PO, Persistent Object) 的存放套件位置 (com.test.entity.po)
+  po: entity.po
+  # 條件查詢參數物件 (Query Param) 的存放套件位置 (com.test.entity.query)
+  param: entity.query
+
+author:
+  # 自動生成 Java 檔案頂部註解中的作者名稱 (@author SweetClown)
+  name: SweetClown

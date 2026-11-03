@@ -1,0 +1,91 @@
+package com.sweetclown.bean;
+
+import com.sun.org.apache.bcel.internal.generic.DASTORE;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import com.sweetclown.utils.YamlConfigUtils;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.error.YAMLException;
+
+public class Constants {
+
+    public static String AUTHOR;
+
+    public static Boolean IGNORE_TABLE_PERFIX;
+
+    public static String SUFFIX_BEAN_PARAM;
+
+    public static String IGNORE_BEAN_TOJSON_FILED;
+    public static String IGNORE_BEAN_TOJSON_EXPRESSION;
+    public static String IGNORE_BEAN_TOJSON_CLASS;
+
+    public static String BEAN_DATE_UNFORMAT_EXPRESSION;
+    public static String BEAN_DATE_UNFORMAT_CLASS;
+
+    public static String BEAN_DATE_FORMAT_EXPRESSION;
+    public static String BEAN_DATE_FORMAT_CLASS;
+
+
+    public static String PATH_BASE;
+
+    public static String PACKAGE_BASE;
+
+    public static String PATH_JAVA = "java";
+
+    public static String PATH_RESOURCE = "resources";
+
+    public static String BASE_PATH;
+
+    public static String PACKAGE_PO;
+
+    public static String PATH_PO;
+
+    public static String PATH_QUERY;
+
+    static {
+        AUTHOR = YamlConfigUtils.getString("author.name");
+        IGNORE_BEAN_TOJSON_FILED = YamlConfigUtils.getString("ignore.bean.tojson.filed");
+        IGNORE_BEAN_TOJSON_EXPRESSION = YamlConfigUtils.getString("ignore.bean.tojson.expression");
+        IGNORE_BEAN_TOJSON_CLASS = YamlConfigUtils.getString("ignore.bean.tojson.class");
+
+        BEAN_DATE_UNFORMAT_EXPRESSION = YamlConfigUtils.getString("bean.date.unformat.expression");
+        BEAN_DATE_UNFORMAT_CLASS = YamlConfigUtils.getString("bean.date.unformat.class");
+
+        BEAN_DATE_FORMAT_EXPRESSION = YamlConfigUtils.getString("bean.date.format.expression");
+        BEAN_DATE_FORMAT_CLASS = YamlConfigUtils.getString("bean.date.format.class");
+
+        IGNORE_TABLE_PERFIX = Boolean.valueOf(YamlConfigUtils.getString("ignore.table.prefix"));
+        SUFFIX_BEAN_PARAM = YamlConfigUtils.getString("suffix.bean.param");
+        PATH_BASE = YamlConfigUtils.getString("path.base");
+        PACKAGE_BASE = YamlConfigUtils.getString("package.base");
+        BASE_PATH = PATH_BASE + "/" + PATH_JAVA + "/" + PACKAGE_BASE;
+        BASE_PATH = BASE_PATH.replace(".", "/");
+        PACKAGE_PO = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.po");
+        PATH_PO = BASE_PATH + "/" + YamlConfigUtils.getString("package.po").replace(".", "/");
+        PATH_QUERY= BASE_PATH + "/" + YamlConfigUtils.getString("package.param").replace(".","/");
+
+    }
+
+    //Date time
+    public static final String[] SQL_DATE_TIME_TYPES = new String[]{"datetime", "timestamp"};
+
+    //Date
+    public static final String[] SQL_DATE_TYPES = new String[]{"date"};
+
+    //Decimal
+    public static final String[] SQL_DECIMAL_TYPES = new String[]{"decimal", "double", "float"};
+
+    //String
+    public static final String[] SQL_STRING_TYPES = new String[]{"char", "varchar", "text", "mediumtext", "longtext"};
+
+    //Integer
+    public static final String[] SQL_INTEGER_TYPES = new String[]{"int", "tinyint"};
+
+    //Long
+    public static final String[] SQL_LONG_TYPES = new String[]{"bigint"};
+
+    public static void main(String args[]){
+        System.out.println(PATH_PO);
+        System.out.println(PACKAGE_PO);
+    }
+
+}
