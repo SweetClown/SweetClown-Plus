@@ -35,9 +35,9 @@ ignore:
   table:
     # 是否自動忽略/切除資料庫表名的前綴詞（例如 t_user 轉為 User 類別）
     prefix: true
-  beam:
-    toJson:
-      filed: companyId, status
+  bean:
+    tojson:
+      filed: password
       expression: '@JsonIgnore'
       class: import com.fasterxml.jackson.annotation.JsonIgnore
 
@@ -66,6 +66,8 @@ package:
   po: entity.po
   # 條件查詢參數物件 (Query Param) 的存放套件位置 (com.test.entity.query)
   param: entity.query
+  enums: enums
+  utils: utils
 
 author:
   # 自動生成 Java 檔案頂部註解中的作者名稱 (@author SweetClown)

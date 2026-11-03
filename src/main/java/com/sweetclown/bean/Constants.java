@@ -14,6 +14,7 @@ public class Constants {
 
     public static String SUFFIX_BEAN_PARAM;
 
+    public static String[] IGNORE_BEAN_TOSTRING_COLUMN;
     public static String IGNORE_BEAN_TOJSON_FILED;
     public static String IGNORE_BEAN_TOJSON_EXPRESSION;
     public static String IGNORE_BEAN_TOJSON_CLASS;
@@ -37,9 +38,19 @@ public class Constants {
 
     public static String PACKAGE_PO;
 
+    public static String PACKAGE_QUERY;
+
+    public static String PACKAGE_UTILS;
+
+    public static String PACKAGE_ENUMS;
+
     public static String PATH_PO;
 
     public static String PATH_QUERY;
+
+    public static String PATH_UTILS;
+
+    public static String PATH_ENUMS;
 
     static {
         AUTHOR = YamlConfigUtils.getString("author.name");
@@ -55,13 +66,27 @@ public class Constants {
 
         IGNORE_TABLE_PERFIX = Boolean.valueOf(YamlConfigUtils.getString("ignore.table.prefix"));
         SUFFIX_BEAN_PARAM = YamlConfigUtils.getString("suffix.bean.param");
+
         PATH_BASE = YamlConfigUtils.getString("path.base");
         PACKAGE_BASE = YamlConfigUtils.getString("package.base");
+
         BASE_PATH = PATH_BASE + "/" + PATH_JAVA + "/" + PACKAGE_BASE;
         BASE_PATH = BASE_PATH.replace(".", "/");
+
         PACKAGE_PO = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.po");
+        PACKAGE_QUERY = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.param");
+        PACKAGE_UTILS = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.utils");
+        PACKAGE_ENUMS = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.enums");
+
         PATH_PO = BASE_PATH + "/" + YamlConfigUtils.getString("package.po").replace(".", "/");
         PATH_QUERY= BASE_PATH + "/" + YamlConfigUtils.getString("package.param").replace(".","/");
+        PATH_UTILS = BASE_PATH + "/" +YamlConfigUtils.getString("package.utils").replace(".","/");
+        PATH_ENUMS = BASE_PATH + "/" + YamlConfigUtils.getString("package.enums").replace(".","/");
+
+        String ignore_bean_tostring_columnstr = YamlConfigUtils.getString("ignore.bean.tostring.column");
+        if (null != ignore_bean_tostring_columnstr) {
+            IGNORE_BEAN_TOSTRING_COLUMN = ignore_bean_tostring_columnstr.split(",");
+        }
 
     }
 
@@ -84,8 +109,8 @@ public class Constants {
     public static final String[] SQL_LONG_TYPES = new String[]{"bigint"};
 
     public static void main(String args[]){
-        System.out.println(PATH_PO);
-        System.out.println(PACKAGE_PO);
+        System.out.println(PATH_UTILS);
+        System.out.println(PACKAGE_UTILS);
     }
 
 }
