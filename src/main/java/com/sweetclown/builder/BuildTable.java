@@ -1,22 +1,17 @@
 package com.sweetclown.builder;
 
-import com.mysql.cj.xdevapi.Table;
 import com.sweetclown.bean.Constants;
 import com.sweetclown.bean.FieldInfo;
 import com.sweetclown.bean.TableInfo;
-import com.sweetclown.utils.JsonUtils;
 import com.sweetclown.utils.StringUtils;
 import com.sweetclown.utils.YamlConfigUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.tomcat.util.bcel.Const;
-import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -62,7 +57,7 @@ public class BuildTable {
                 tableInfo.setTableName(tableName);
                 tableInfo.setBeanName(beanName);
                 tableInfo.setComment(comment);
-                tableInfo.setBeanParamName(beanName + Constants.SUFFIX_BEAN_PARAM);
+                tableInfo.setBeanParamName(beanName + Constants.SUFFIX_BEAN_QUERY);
 
                 readFieldInfo(tableInfo);
                 getKeyIndexInfo(tableInfo);

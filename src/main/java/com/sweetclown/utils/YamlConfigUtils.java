@@ -48,11 +48,6 @@ public class YamlConfigUtils {
 
     //Test Method
     public static void main(String[] args) {
-
-        //Test for get Application name
-        System.out.println(YamlConfigUtils.getString("spring.application.name"));
-
-        //Test for get DataSource Url
-        System.out.println(YamlConfigUtils.getString("spring.datasource.url"));
+        System.out.println(yamlMap);
     }
 }

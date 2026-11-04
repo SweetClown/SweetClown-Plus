@@ -1,10 +1,6 @@
 package com.sweetclown.bean;
 
-import com.sun.org.apache.bcel.internal.generic.DASTORE;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.sweetclown.utils.YamlConfigUtils;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.error.YAMLException;
 
 public class Constants {
 
@@ -12,7 +8,10 @@ public class Constants {
 
     public static Boolean IGNORE_TABLE_PERFIX;
 
-    public static String SUFFIX_BEAN_PARAM;
+    public static String SUFFIX_BEAN_QUERY;
+    public static String SUFFIX_BEAN_QUERY_START;
+    public static String SUFFIX_BEAN_QUERY_END;
+    public static String SUFFIX_BEAN_QUERY_FUZZY;
 
     public static String[] IGNORE_BEAN_TOSTRING_COLUMN;
     public static String IGNORE_BEAN_TOJSON_FILED;
@@ -65,7 +64,10 @@ public class Constants {
         BEAN_DATE_FORMAT_CLASS = YamlConfigUtils.getString("bean.date.format.class");
 
         IGNORE_TABLE_PERFIX = Boolean.valueOf(YamlConfigUtils.getString("ignore.table.prefix"));
-        SUFFIX_BEAN_PARAM = YamlConfigUtils.getString("suffix.bean.param");
+        SUFFIX_BEAN_QUERY = YamlConfigUtils.getString("suffix.bean.query");
+        SUFFIX_BEAN_QUERY_FUZZY = YamlConfigUtils.getString("suffix.bean.query.fuzzy");
+        SUFFIX_BEAN_QUERY_START = YamlConfigUtils.getString("suffix.bean.query.time.start");
+        SUFFIX_BEAN_QUERY_END = YamlConfigUtils.getString("suffix.bean.query.time.end");
 
         PATH_BASE = YamlConfigUtils.getString("path.base");
         PACKAGE_BASE = YamlConfigUtils.getString("package.base");
@@ -74,12 +76,12 @@ public class Constants {
         BASE_PATH = BASE_PATH.replace(".", "/");
 
         PACKAGE_PO = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.po");
-        PACKAGE_QUERY = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.param");
+        PACKAGE_QUERY = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.query");
         PACKAGE_UTILS = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.utils");
         PACKAGE_ENUMS = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.enums");
 
         PATH_PO = BASE_PATH + "/" + YamlConfigUtils.getString("package.po").replace(".", "/");
-        PATH_QUERY= BASE_PATH + "/" + YamlConfigUtils.getString("package.param").replace(".","/");
+        PATH_QUERY= BASE_PATH + "/" + YamlConfigUtils.getString("package.query").replace(".","/");
         PATH_UTILS = BASE_PATH + "/" +YamlConfigUtils.getString("package.utils").replace(".","/");
         PATH_ENUMS = BASE_PATH + "/" + YamlConfigUtils.getString("package.enums").replace(".","/");
 
