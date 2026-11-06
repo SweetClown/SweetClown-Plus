@@ -1,6 +1,6 @@
 package com.sweetclown.builder;
 
-import com.sun.xml.internal.stream.Entity;
+import com.alibaba.fastjson.JSON;
 import com.sweetclown.bean.Constants;
 import com.sweetclown.bean.FieldInfo;
 import com.sweetclown.bean.TableInfo;
@@ -11,6 +11,7 @@ import org.apache.tomcat.util.bcel.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.plaf.synth.SynthScrollBarUI;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +62,7 @@ public class BuildQuery {
 
             bw.newLine();
             BuildComment.createClassComment(bw, tableInfo.getComment()+ "查詢對象");
-            bw.write("public class " + className + " {");
+            bw.write("public class " + className + " extends BaseQuery {");
             bw.newLine();
 
             List<FieldInfo> extendList = new ArrayList();
@@ -96,40 +97,11 @@ public class BuildQuery {
                     bw.write("\tprivate String " + field.getPropertyName() + com.sweetclown.utils.StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_END) + ";");
                     bw.newLine();
                     bw.newLine();
-
-                    FieldInfo timeStartField = new FieldInfo();
-                    timeStartField.setJavaType("String");
-                    timeStartField.setPropertyName(field.getPropertyName() + com.sweetclown.utils.StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_START));
-                    extendList.add(timeStartField);
-
-                    FieldInfo timeEndField = new FieldInfo();
-                    timeEndField.setJavaType("String");
-                    timeEndField.setPropertyName(field.getPropertyName() + com.sweetclown.utils.StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_END));
-                    extendList.add(timeEndField);
-
                 }
             }
 
-            List<FieldInfo> fieldInfoList  = tableInfo.getFieldList();
-            fieldInfoList.addAll(extendList);
-            for (FieldInfo field : fieldInfoList) {
-                String tempField = com.sweetclown.utils.StringUtils.upperCaseFirstLetter(field.getPropertyName());
-                bw.write("\tpublic void set" + tempField + "(" + field.getJavaType() + " " + field.getPropertyName() + ") {");
-                bw.newLine();
-                bw.write("\t\tthis." + field.getPropertyName() + " = " + field.getPropertyName() + ";");
-                bw.newLine();
-                bw.write("\t}");
-                bw.newLine();
-                bw.newLine();
-                bw.write("\tpublic " + field.getJavaType() + " get" + tempField + "() {");
-                bw.newLine();
-                bw.write("\t\treturn " + field.getPropertyName() + ";");
-                bw.newLine();
-                bw.write("\t}");
-                bw.newLine();
-                bw.newLine();
-            }
-
+            buildGetSet(bw, tableInfo.getFieldList());
+            buildGetSet(bw, tableInfo.getFieldExtendList());
             bw.write("}");
             bw.flush();
         } catch (Exception e) {
@@ -159,7 +131,26 @@ public class BuildQuery {
                 }
             }
         }
+    }
 
+    private static void buildGetSet(BufferedWriter bw,List<FieldInfo> fieldInfoList) throws Exception {
+        for (FieldInfo field : fieldInfoList) {
+            String tempField = com.sweetclown.utils.StringUtils.upperCaseFirstLetter(field.getPropertyName());
+            bw.write("\tpublic void set" + tempField + "(" + field.getJavaType() + " " + field.getPropertyName() + ") {");
+            bw.newLine();
+            bw.write("\t\tthis." + field.getPropertyName() + " = " + field.getPropertyName() + ";");
+            bw.newLine();
+            bw.write("\t}");
+            bw.newLine();
+            bw.newLine();
+            bw.write("\tpublic " + field.getJavaType() + " get" + tempField + "() {");
+            bw.newLine();
+            bw.write("\t\treturn " + field.getPropertyName() + ";");
+            bw.newLine();
+            bw.write("\t}");
+            bw.newLine();
+            bw.newLine();
+        }
     }
 
 }
