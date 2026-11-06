@@ -96,6 +96,7 @@ public class BuildTable {
         PreparedStatement ps = null;
         ResultSet fieldResult = null;
         List<FieldInfo> fieldInfoList = new ArrayList();
+        List<FieldInfo> fieldExtendList = new ArrayList();
         try {
             ps = connection.prepareStatement(String.format(SQL_SHOW_FULL_FIELDS_TABLE, tableInfo.getTableName()));
             fieldResult = ps.executeQuery();
@@ -129,11 +130,39 @@ public class BuildTable {
                 if (ArrayUtils.contains(Constants.SQL_DECIMAL_TYPES, type)) {
                     haveBigDecimal = true;
                 }
+
+                if (ArrayUtils.contains(Constants.SQL_STRING_TYPES, type)) {
+                    FieldInfo fuzzyField = new FieldInfo();
+                    fuzzyField.setJavaType(fieldInfo.getJavaType());
+                    fuzzyField.setPropertyName(fieldInfo.getPropertyName()+ com.sweetclown.utils.StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_FUZZY));
+                    fuzzyField.setSqlType(type);
+                    fieldExtendList.add(fuzzyField);
+                }
+
+
+                if (ArrayUtils.contains(Constants.SQL_DATE_TYPES, type) || ArrayUtils.contains(Constants.SQL_DATE_TIME_TYPES, type)) {
+
+                    FieldInfo timeStartField = new FieldInfo();
+                    timeStartField.setJavaType("String");
+                    timeStartField.setPropertyName(fieldInfo.getPropertyName() + com.sweetclown.utils.StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_START));
+                    timeStartField.setFieldName(fieldInfo.getPropertyName());
+                    timeStartField.setSqlType(type);
+                    fieldExtendList.add(timeStartField);
+
+                    FieldInfo timeEndField = new FieldInfo();
+                    timeEndField.setJavaType("String");
+                    timeEndField.setPropertyName(fieldInfo.getPropertyName() + com.sweetclown.utils.StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_END));
+                    timeEndField.setFieldName(fieldInfo.getPropertyName());
+                    timeEndField.setSqlType(type);
+                    fieldExtendList.add(timeEndField);
+
+                }
             }
             tableInfo.setHaveDateTime(haveDateTime);
             tableInfo.setHaveDate(haveDate);
             tableInfo.setHaveBigDecimal(haveBigDecimal);
             tableInfo.setFieldList(fieldInfoList);
+            tableInfo.setFieldExtendList(fieldExtendList);
         } catch (Exception e) {
             logger.error("Read Field Fail", e);
         } finally {
