@@ -1,10 +1,7 @@
 package com.sweetclown;
 
 import com.sweetclown.bean.TableInfo;
-import com.sweetclown.builder.BuildBase;
-import com.sweetclown.builder.BuildPo;
-import com.sweetclown.builder.BuildQuery;
-import com.sweetclown.builder.BuildTable;
+import com.sweetclown.builder.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -21,6 +18,8 @@ public class RunApplication {
         for (TableInfo tableInfo : tableInfoList) {
             BuildPo.execute(tableInfo);
             BuildQuery.execute(tableInfo);
+            BuildMapper.execute(tableInfo);
+            BuildMapperXML.execute(tableInfo);
         }
     }
 }
