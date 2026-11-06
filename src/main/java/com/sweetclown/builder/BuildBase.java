@@ -15,12 +15,37 @@ public class BuildBase {
     public static void execute() {
         List<String> headerInfoList = new ArrayList<>();
 
+        //Generate DateTimePatternEnum
         headerInfoList.add("package " + Constants.PACKAGE_ENUMS);
         build(headerInfoList,"DateTimePatternEnum", Constants.PATH_ENUMS);
         headerInfoList.clear();
 
+        //Generate PageSize
+        headerInfoList.add("package " + Constants.PACKAGE_ENUMS);
+        build(headerInfoList,"PageSize", Constants.PATH_ENUMS);
+        headerInfoList.clear();
+
+        //Generate DateUtil
         headerInfoList.add("package " + Constants.PACKAGE_UTILS);
         build(headerInfoList,"DateUtil", Constants.PATH_UTILS);
+        headerInfoList.clear();
+
+        //Generate BaseMapper
+        headerInfoList.add("package " + Constants.PACKAGE_MAPPERS);
+        build(headerInfoList,"BaseMapper", Constants.PATH_MAPPERS);
+        headerInfoList.clear();
+
+        //Generate BaseQuery
+        headerInfoList.add("package " + Constants.PACKAGE_QUERY);
+        build(headerInfoList,"BaseQuery", Constants.PATH_QUERY);
+        headerInfoList.clear();
+
+        //Generate SimplePage
+        headerInfoList.add("package " + Constants.PACKAGE_QUERY);
+        headerInfoList.add("import " + Constants.PACKAGE_ENUMS + ".PageSize");
+        build(headerInfoList,"SimplePage", Constants.PATH_QUERY);
+        headerInfoList.clear();
+
     }
 
     private static void build(List<String> headerInfoList, String fileName, String outPutPath) {

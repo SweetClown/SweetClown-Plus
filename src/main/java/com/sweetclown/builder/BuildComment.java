@@ -10,19 +10,16 @@ import java.util.Date;
 
 public class BuildComment {
 
-    public static void createClassComment(BufferedWriter bw,String classComment) throws IOException {
+    public static void createClassComment(BufferedWriter bw, String text) throws IOException {
+        bw.newLine();
+        bw.newLine();
         bw.write("/**");
         bw.newLine();
-        bw.write(" * @Description:" + classComment);
-        bw.write(" *");
-        bw.newLine();
-        bw.write(" * @author:" + Constants.AUTHOR);
-        bw.newLine();
-        bw.write(" * @date:" + DateUtils.format(new Date(),DateUtils.YYYY_MM_DD));
+        bw.write(" * " + text);
         bw.newLine();
         bw.write(" */");
         bw.newLine();
-    };
+    }
 
     public static void createFieldComment(BufferedWriter bw,String fieldComment) throws IOException {
         bw.write("\t/**");
