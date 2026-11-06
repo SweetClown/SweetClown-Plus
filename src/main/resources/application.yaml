@@ -51,6 +51,7 @@ bean:
       class: import com.fasterxml.jackson.annotation.JsonFormat
 
 suffix:
+  mappers: mappers
   bean:
     # 查詢參數物件 (DTO/Param) 的類別名稱後綴（例如 UserQuery）
     query: "query"
@@ -72,6 +73,7 @@ package:
   query: entity.query
   enums: enums
   utils: utils
+  mappers: mappers
 
 author:
   # 自動生成 Java 檔案頂部註解中的作者名稱 (@author SweetClown)

@@ -8,6 +8,7 @@ public class Constants {
 
     public static Boolean IGNORE_TABLE_PERFIX;
 
+    public static String SUFFIX_MAPPER;
     public static String SUFFIX_BEAN_QUERY;
     public static String SUFFIX_BEAN_QUERY_START;
     public static String SUFFIX_BEAN_QUERY_END;
@@ -35,6 +36,8 @@ public class Constants {
 
     public static String BASE_PATH;
 
+    public static String BASE_RESOURCE;
+
     public static String PACKAGE_PO;
 
     public static String PACKAGE_QUERY;
@@ -43,6 +46,8 @@ public class Constants {
 
     public static String PACKAGE_ENUMS;
 
+    public static String PACKAGE_MAPPERS;
+
     public static String PATH_PO;
 
     public static String PATH_QUERY;
@@ -50,6 +55,10 @@ public class Constants {
     public static String PATH_UTILS;
 
     public static String PATH_ENUMS;
+
+    public static String PATH_MAPPERS;
+
+    public static String PATH_MAPPERS_XMLS;
 
     static {
         AUTHOR = YamlConfigUtils.getString("author.name");
@@ -64,6 +73,7 @@ public class Constants {
         BEAN_DATE_FORMAT_CLASS = YamlConfigUtils.getString("bean.date.format.class");
 
         IGNORE_TABLE_PERFIX = Boolean.valueOf(YamlConfigUtils.getString("ignore.table.prefix"));
+        SUFFIX_MAPPER = YamlConfigUtils.getString("suffix.mappers");
         SUFFIX_BEAN_QUERY = YamlConfigUtils.getString("suffix.bean.query");
         SUFFIX_BEAN_QUERY_FUZZY = YamlConfigUtils.getString("suffix.bean.query.fuzzy");
         SUFFIX_BEAN_QUERY_START = YamlConfigUtils.getString("suffix.bean.query.time.start");
@@ -74,16 +84,21 @@ public class Constants {
 
         BASE_PATH = PATH_BASE + "/" + PATH_JAVA + "/" + PACKAGE_BASE;
         BASE_PATH = BASE_PATH.replace(".", "/");
+        BASE_RESOURCE = PATH_BASE+ "/" + PATH_RESOURCE + "/" + PACKAGE_BASE;
+        BASE_RESOURCE = BASE_RESOURCE.replace(".", "/");
 
         PACKAGE_PO = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.po");
         PACKAGE_QUERY = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.query");
         PACKAGE_UTILS = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.utils");
         PACKAGE_ENUMS = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.enums");
+        PACKAGE_MAPPERS = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.mappers");
 
         PATH_PO = BASE_PATH + "/" + YamlConfigUtils.getString("package.po").replace(".", "/");
         PATH_QUERY= BASE_PATH + "/" + YamlConfigUtils.getString("package.query").replace(".","/");
         PATH_UTILS = BASE_PATH + "/" +YamlConfigUtils.getString("package.utils").replace(".","/");
         PATH_ENUMS = BASE_PATH + "/" + YamlConfigUtils.getString("package.enums").replace(".","/");
+        PATH_MAPPERS = BASE_PATH + "/" + YamlConfigUtils.getString("package.mappers").replace(".","/");
+        PATH_MAPPERS_XMLS = BASE_RESOURCE + "/" + YamlConfigUtils.getString("package.mappers").replace(".","/");
 
         String ignore_bean_tostring_columnstr = YamlConfigUtils.getString("ignore.bean.tostring.column");
         if (null != ignore_bean_tostring_columnstr) {
@@ -111,8 +126,8 @@ public class Constants {
     public static final String[] SQL_LONG_TYPES = new String[]{"bigint"};
 
     public static void main(String args[]){
-        System.out.println(PATH_UTILS);
-        System.out.println(PACKAGE_UTILS);
+        System.out.println(BASE_RESOURCE);
+        System.out.println(PATH_MAPPERS_XMLS);
     }
 
 }
