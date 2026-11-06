@@ -1,6 +1,5 @@
 package com.sweetclown.bean;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.sweetclown.bean.FieldInfo;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,6 +31,8 @@ public class TableInfo {
      * 該資料表所包含的所有欄位資訊列表
      */
     private List<FieldInfo> fieldList;
+
+    private List<FieldInfo> fieldExtendList;
 
     /**
      * 資料表的索引/主鍵映射關係
@@ -125,5 +126,13 @@ public class TableInfo {
 
     public void setHaveBigDecimal(Boolean haveBigDecimal) {
         this.haveBigDecimal = haveBigDecimal;
+    }
+
+    public List<FieldInfo> getFieldExtendList() {
+        return fieldExtendList;
+    }
+
+    public void setFieldExtendList(List<FieldInfo> fieldExtendList) {
+        this.fieldExtendList = fieldExtendList;
     }
 }
