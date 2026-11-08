@@ -56,6 +56,8 @@ public class TableInfo {
      */
     private Boolean haveBigDecimal;
 
+    private Boolean haveAutoIncrement;
+
     public String getTableName() {
         return tableName;
     }
@@ -134,5 +136,13 @@ public class TableInfo {
 
     public void setFieldExtendList(List<FieldInfo> fieldExtendList) {
         this.fieldExtendList = fieldExtendList;
+    }
+
+    public Boolean getHaveAutoIncrement() {
+        return haveAutoIncrement;
+    }
+
+    public void setHaveAutoIncrement(Boolean haveAutoIncrement) {
+        this.haveAutoIncrement = haveAutoIncrement;
     }
 }
