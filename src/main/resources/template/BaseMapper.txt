@@ -11,35 +11,35 @@ public interface BaseMapper<T, P> {
     /**
      * selectCount:(根據參數查詢資料筆數)
      */
-    Integer selectCount(@Param("query") P p);
+    Long selectCount(@Param("query") P p);
 
     /**
      * insert:(新增)
      */
-    Integer insert(@Param("bean") T t);
+    Long insert(@Param("bean") T t);
 
     /**
      * insertOrUpdate:(新增或更新)
      */
-    Integer insertOrUpdate(@Param("bean") T t);
+    Long insertOrUpdate(@Param("bean") T t);
 
     /**
      * insertBatch:(批次新增)
      */
-    Integer insertBatch(@Param("list") List<T> list);
+    Long insertBatch(@Param("list") List<T> list);
 
     /**
      * insertOrUpdateBatch:(批次新增或更新)
      */
-    Integer insertOrUpdateBatch(@Param("list") List<T> list);
+    Long insertOrUpdateBatch(@Param("list") List<T> list);
 
     /**
      * updateByParams:(多條件更新)
      */
-    Integer updateByParam(@Param("bean") T t, @Param("query") P p);
+    Long updateByParam(@Param("bean") T t, @Param("query") P p);
 
     /**
      * deleteByParam:(多條件刪除)
      */
-    Integer deleteByParam(@Param("query") P p);
+    Long deleteByParam(@Param("query") P p);
 }
