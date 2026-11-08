@@ -152,10 +152,10 @@ public class BuildPo {
                     column = "(" + column + " == null ? \"空\" : " + column + ")";
                 }
 
-                toString.append("\"" + properName + ":\"+" + column + "+");
+                toString.append("\"," + properName + ":\"+" + column + "+");
             }
 
-            String toStringResult = "\"" + toString.substring(1, toString.length() - 1) + ";";
+            String toStringResult = "\"" + toString.substring(2, toString.length() - 1) + ";";
 
             bw.write("\t@Override");
             bw.newLine();
