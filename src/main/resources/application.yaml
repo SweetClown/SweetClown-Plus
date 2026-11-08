@@ -74,6 +74,8 @@ package:
   enums: enums
   utils: utils
   mappers: mappers
+  service: service
+  service.impl: serviceImpl
 
 author:
   # 自動生成 Java 檔案頂部註解中的作者名稱 (@author SweetClown)

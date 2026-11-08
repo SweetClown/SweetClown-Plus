@@ -48,6 +48,10 @@ public class Constants {
 
     public static String PACKAGE_MAPPERS;
 
+    public static String PACKAGE_SERVICE;
+
+    public static String PACKAGE_SERVICE_IMPL;
+
     public static String PATH_PO;
 
     public static String PATH_QUERY;
@@ -59,6 +63,10 @@ public class Constants {
     public static String PATH_MAPPERS;
 
     public static String PATH_MAPPERS_XMLS;
+
+    public static String PATH_SERVICE;
+
+    public static String PATH_SERVICE_IMPL;
 
     static {
         AUTHOR = YamlConfigUtils.getString("author.name");
@@ -92,6 +100,8 @@ public class Constants {
         PACKAGE_UTILS = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.utils");
         PACKAGE_ENUMS = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.enums");
         PACKAGE_MAPPERS = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.mappers");
+        PACKAGE_SERVICE = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.service");
+        PACKAGE_SERVICE_IMPL = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.service.impl");
 
         PATH_PO = BASE_PATH + "/" + YamlConfigUtils.getString("package.po").replace(".", "/");
         PATH_QUERY= BASE_PATH + "/" + YamlConfigUtils.getString("package.query").replace(".","/");
@@ -99,6 +109,8 @@ public class Constants {
         PATH_ENUMS = BASE_PATH + "/" + YamlConfigUtils.getString("package.enums").replace(".","/");
         PATH_MAPPERS = BASE_PATH + "/" + YamlConfigUtils.getString("package.mappers").replace(".","/");
         PATH_MAPPERS_XMLS = BASE_RESOURCE + "/" + YamlConfigUtils.getString("package.mappers").replace(".","/");
+        PATH_SERVICE = BASE_PATH + "/" + YamlConfigUtils.getString("package.service").replace(".","/");
+        PATH_SERVICE_IMPL = BASE_PATH + "/" + YamlConfigUtils.getString("package.serviceImpl").replace(".","/");
 
         String ignore_bean_tostring_columnstr = YamlConfigUtils.getString("ignore.bean.tostring.column");
         if (null != ignore_bean_tostring_columnstr) {
@@ -128,6 +140,7 @@ public class Constants {
     public static void main(String args[]){
         System.out.println(BASE_RESOURCE);
         System.out.println(PATH_MAPPERS_XMLS);
+        System.out.println(PACKAGE_PO);
     }
 
 }
