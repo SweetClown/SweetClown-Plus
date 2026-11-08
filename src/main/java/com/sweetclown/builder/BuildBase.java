@@ -46,6 +46,52 @@ public class BuildBase {
         build(headerInfoList,"SimplePage", Constants.PATH_QUERY);
         headerInfoList.clear();
 
+        //Generate PaginationResultVO
+        headerInfoList.add("package " + Constants.PACKAGE_VO);
+        headerInfoList.add("import java.util.ArrayList");
+        headerInfoList.add("import java.util.List");
+        build(headerInfoList, "PaginationResultVO", Constants.PATH_VO);
+        headerInfoList.clear();
+
+        //Generate ResponseVo
+        headerInfoList.add("package " + Constants.PACKAGE_VO);
+        build(headerInfoList, "ResponseVO", Constants.PATH_VO);
+        headerInfoList.clear();
+
+        //Generate BaseController
+        headerInfoList.add("package " + Constants.PACKAGE_CONTROLLER);
+        headerInfoList.add("import " + Constants.PACKAGE_ENUMS + ".ResponseCodeEnum");
+        headerInfoList.add("import " + Constants.PACKAGE_VO + ".ResponseVO");
+        headerInfoList.add("import " + Constants.PACKAGE_EXCEPTION + ".BusinessException");
+        build(headerInfoList, "ABaseController", Constants.PATH_CONTROLLER);
+        headerInfoList.clear();
+
+        //Generate AGlobalExceptionHandlerController
+        headerInfoList.add("package " + Constants.PACKAGE_CONTROLLER);
+        headerInfoList.add("import " + Constants.PACKAGE_ENUMS + ".ResponseCodeEnum");
+        headerInfoList.add("import " + Constants.PACKAGE_VO + ".ResponseVO");
+        headerInfoList.add("import " + Constants.PACKAGE_EXCEPTION + ".BusinessException");
+        build(headerInfoList, "AGlobalExceptionHandlerController", Constants.PATH_CONTROLLER);
+        headerInfoList.clear();
+
+        //Generate BusinessException
+        headerInfoList.add("package " + Constants.PACKAGE_EXCEPTION);
+        headerInfoList.add("import " + Constants.PACKAGE_ENUMS + ".ResponseCodeEnum");
+        build(headerInfoList, "BusinessException", Constants.PATH_EXCEPTION);
+        headerInfoList.clear();
+
+        //Generate StringTools
+        headerInfoList.add("package " + Constants.PACKAGE_UTILS);
+        headerInfoList.add("import " + Constants.PACKAGE_EXCEPTION + ".BusinessException");
+        headerInfoList.add("import java.lang.reflect.Field");
+        headerInfoList.add("import java.lang.reflect.Method");
+        build(headerInfoList, "StringTools", Constants.PATH_UTILS);
+        headerInfoList.clear();
+
+        //Generate ResponseCodeEnum
+        headerInfoList.add("package " + Constants.PACKAGE_ENUMS);
+        build(headerInfoList, "ResponseCodeEnum", Constants.PATH_ENUMS);
+        headerInfoList.clear();
     }
 
     private static void build(List<String> headerInfoList, String fileName, String outPutPath) {

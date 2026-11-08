@@ -1,6 +1,6 @@
 package com.sweetclown.utils;
 
-public class StringUtils {
+public class StringTools {
 
     public static String upperCaseFirstLetter(String field) {
         if (org.apache.commons.lang3.StringUtils.isEmpty(field)) {

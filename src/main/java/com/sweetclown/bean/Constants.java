@@ -40,6 +40,8 @@ public class Constants {
 
     public static String PACKAGE_PO;
 
+    public static String PACKAGE_VO;
+
     public static String PACKAGE_QUERY;
 
     public static String PACKAGE_UTILS;
@@ -52,7 +54,13 @@ public class Constants {
 
     public static String PACKAGE_SERVICE_IMPL;
 
+    public static String PACKAGE_CONTROLLER;
+
+    public static String PACKAGE_EXCEPTION;
+
     public static String PATH_PO;
+
+    public static String PATH_VO;
 
     public static String PATH_QUERY;
 
@@ -67,6 +75,10 @@ public class Constants {
     public static String PATH_SERVICE;
 
     public static String PATH_SERVICE_IMPL;
+
+    public static String PATH_CONTROLLER;
+
+    public static String PATH_EXCEPTION;
 
     static {
         AUTHOR = YamlConfigUtils.getString("author.name");
@@ -96,21 +108,27 @@ public class Constants {
         BASE_RESOURCE = BASE_RESOURCE.replace(".", "/");
 
         PACKAGE_PO = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.po");
+        PACKAGE_VO = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.vo");
         PACKAGE_QUERY = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.query");
         PACKAGE_UTILS = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.utils");
         PACKAGE_ENUMS = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.enums");
         PACKAGE_MAPPERS = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.mappers");
         PACKAGE_SERVICE = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.service");
         PACKAGE_SERVICE_IMPL = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.service.impl");
+        PACKAGE_CONTROLLER = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.controller");
+        PACKAGE_EXCEPTION = PACKAGE_BASE + "." + YamlConfigUtils.getString("package.exception");
 
         PATH_PO = BASE_PATH + "/" + YamlConfigUtils.getString("package.po").replace(".", "/");
+        PATH_VO = BASE_PATH + "/" + YamlConfigUtils.getString("package.vo").replace(".", "/");
         PATH_QUERY= BASE_PATH + "/" + YamlConfigUtils.getString("package.query").replace(".","/");
         PATH_UTILS = BASE_PATH + "/" +YamlConfigUtils.getString("package.utils").replace(".","/");
         PATH_ENUMS = BASE_PATH + "/" + YamlConfigUtils.getString("package.enums").replace(".","/");
         PATH_MAPPERS = BASE_PATH + "/" + YamlConfigUtils.getString("package.mappers").replace(".","/");
         PATH_MAPPERS_XMLS = BASE_RESOURCE + "/" + YamlConfigUtils.getString("package.mappers").replace(".","/");
         PATH_SERVICE = BASE_PATH + "/" + YamlConfigUtils.getString("package.service").replace(".","/");
-        PATH_SERVICE_IMPL = BASE_PATH + "/" + YamlConfigUtils.getString("package.serviceImpl").replace(".","/");
+        PATH_SERVICE_IMPL = BASE_PATH + "/" + YamlConfigUtils.getString("package.service.impl").replace(".","/");
+        PATH_CONTROLLER = BASE_PATH + "/" + YamlConfigUtils.getString("package.controller").replace(".","/");
+        PATH_EXCEPTION = BASE_PATH + "/" + YamlConfigUtils.getString("package.exception").replace(".","/");
 
         String ignore_bean_tostring_columnstr = YamlConfigUtils.getString("ignore.bean.tostring.column");
         if (null != ignore_bean_tostring_columnstr) {

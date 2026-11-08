@@ -3,14 +3,11 @@ package com.sweetclown.builder;
 import com.sweetclown.bean.Constants;
 import com.sweetclown.bean.FieldInfo;
 import com.sweetclown.bean.TableInfo;
-import com.sweetclown.utils.DateUtils;
-import com.sweetclown.utils.StringUtils;
-import org.apache.commons.lang3.ArrayUtils;
+import com.sweetclown.utils.StringTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +22,7 @@ public class BuildMapper {
             folder.mkdirs();
         }
 
-        String className = tableInfo.getBeanName() + com.sweetclown.utils.StringUtils.upperCaseFirstLetter(Constants.SUFFIX_MAPPER);
+        String className = tableInfo.getBeanName() + StringTools.upperCaseFirstLetter(Constants.SUFFIX_MAPPER);
 
         File mapperFile = new File(folder,className + ".java");
 
@@ -57,7 +54,7 @@ public class BuildMapper {
                 StringBuilder methodParams = new StringBuilder();
                 for (FieldInfo fieldInfo : keyFieldInfoList) {
                     index++;
-                    methodName.append(StringUtils.upperCaseFirstLetter(fieldInfo.getPropertyName()));
+                    methodName.append(StringTools.upperCaseFirstLetter(fieldInfo.getPropertyName()));
                     if (index < keyFieldInfoList.size()) {
                         methodName.append("And");
                     }

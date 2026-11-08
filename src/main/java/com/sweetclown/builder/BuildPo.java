@@ -4,6 +4,7 @@ import com.sweetclown.bean.Constants;
 import com.sweetclown.bean.FieldInfo;
 import com.sweetclown.bean.TableInfo;
 import com.sweetclown.utils.DateUtils;
+import com.sweetclown.utils.StringTools;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -107,7 +108,7 @@ public class BuildPo {
             }
 
             for (FieldInfo field : tableInfo.getFieldList()) {
-                String tempField = com.sweetclown.utils.StringUtils.upperCaseFirstLetter(field.getPropertyName());
+                String tempField = StringTools.upperCaseFirstLetter(field.getPropertyName());
                 bw.write("\tpublic void set" + tempField + "(" + field.getJavaType() + " " + field.getPropertyName() + ") {");
                 bw.newLine();
                 bw.write("\t\tthis." + field.getPropertyName() + " = " + field.getPropertyName() + ";");

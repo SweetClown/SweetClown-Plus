@@ -69,13 +69,16 @@ package:
   base: com.test.demo
   # 持久化實體物件 (PO, Persistent Object) 的存放套件位置 (com.test.entity.po)
   po: entity.po
+  vo: entity.vo
   # 條件查詢參數物件 (Query Param) 的存放套件位置 (com.test.entity.query)
   query: entity.query
-  enums: enums
+  enums: entity.enums
   utils: utils
   mappers: mappers
   service: service
-  service.impl: serviceImpl
+  service.impl: service.impl
+  controller: controller
+  exception: exception
 
 author:
   # 自動生成 Java 檔案頂部註解中的作者名稱 (@author SweetClown)

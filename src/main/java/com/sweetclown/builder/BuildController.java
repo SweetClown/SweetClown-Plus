@@ -1,0 +1,220 @@
+package com.sweetclown.builder;
+
+import com.sweetclown.bean.Constants;
+import com.sweetclown.bean.FieldInfo;
+import com.sweetclown.bean.TableInfo;
+import com.sweetclown.utils.StringTools;
+
+import java.io.*;
+import java.util.List;
+import java.util.Map;
+
+public class BuildController {
+
+    public static void execute(TableInfo tableInfo) {
+
+        File folder = new File(Constants.PATH_CONTROLLER);
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+        File beanFile = new File(Constants.PATH_CONTROLLER, tableInfo.getBeanName() + "Controller.java");
+        OutputStream out = null;
+        OutputStreamWriter outw = null;
+        BufferedWriter bw = null;
+
+        try {
+            out = new FileOutputStream(beanFile);
+            outw = new OutputStreamWriter(out, "utf-8");
+            bw = new BufferedWriter(outw);
+            bw.write("package " + Constants.PACKAGE_CONTROLLER + ";");
+            bw.newLine();
+            bw.newLine();
+            bw.write("import java.util.List;");
+            bw.newLine();
+            bw.newLine();
+            bw.write("import " + Constants.PACKAGE_QUERY + "." + tableInfo.getBeanParamName() + ";");
+            bw.newLine();
+            bw.write("import " + Constants.PACKAGE_PO + "." + tableInfo.getBeanName() + ";");
+            bw.newLine();
+            bw.write("import " + Constants.PACKAGE_VO + ".ResponseVO;");
+            bw.newLine();
+            bw.write("import " + Constants.PACKAGE_SERVICE + "." + tableInfo.getBeanName() + "Service;");
+            bw.newLine();
+            bw.write("import org.springframework.web.bind.annotation.RequestBody;");
+            bw.newLine();
+            bw.write("import org.springframework.web.bind.annotation.RequestMapping;");
+            bw.newLine();
+            bw.write("import org.springframework.web.bind.annotation.RestController;");
+            bw.newLine();
+            bw.newLine();
+            bw.write("import jakarta.annotation.Resource;");
+            BuildComment.createFieldComment(bw, tableInfo.getComment() + " Controller");
+            bw.newLine();
+            bw.write("@RestController(\"" + StringTools.lowerCaseFirstLetter(tableInfo.getBeanName()) + "Controller\")");
+            bw.newLine();
+            bw.write("@RequestMapping(\"/" + StringTools.lowerCaseFirstLetter(tableInfo.getBeanName()) + "\")");
+            bw.newLine();
+            bw.write("public class " + tableInfo.getBeanName() + "Controller extends ABaseController{");
+            bw.newLine();
+
+            String beanName = tableInfo.getBeanName();
+
+            bw.newLine();
+            bw.write("\t@Resource");
+            bw.newLine();
+            String serviceBean = StringTools.lowerCaseFirstLetter(beanName + "Service");
+            bw.write("\tprivate " + tableInfo.getBeanName() + "Service " + serviceBean + ";");
+
+            String tableNameParam = "";
+//            Boolean splitTable = Constants.TABLE_SPLIT.contains(tableInfo.getSourceTableName());
+//            if (splitTable) {
+//                tableNameParam = "null,";
+//            }
+
+            //根据条件查询列表
+            BuildComment.createFieldComment(bw, "Paginated query based on conditions");
+            bw.newLine();
+            bw.write("\t@RequestMapping(\"/loadDataList\")");
+            bw.newLine();
+            String paramName = StringTools.lowerCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY);
+            bw.write("\tpublic ResponseVO loadDataList(" + tableInfo.getBeanParamName() + " " + paramName + "){");
+            bw.newLine();
+
+            bw.write("\t\treturn getSuccessResponseVO(" + serviceBean + ".findListByPage(" + tableNameParam + paramName + "));");
+            bw.newLine();
+            bw.write("\t}");
+            bw.newLine();
+
+            //新增
+            BuildComment.createFieldComment(bw, "Add");
+            bw.newLine();
+            bw.write("\t@RequestMapping(\"/add\")");
+            bw.newLine();
+            bw.write("\tpublic ResponseVO add(" + tableInfo.getBeanName() + " bean) {");
+            bw.newLine();
+            bw.write("\t\t" + serviceBean + ".add(" + tableNameParam + "bean);");
+            bw.newLine();
+            bw.write("\t\treturn getSuccessResponseVO(null);");
+            bw.newLine();
+            bw.write("\t}");
+            bw.newLine();
+
+            //批量新增的方法
+            BuildComment.createFieldComment(bw, "Add Batch");
+            bw.newLine();
+            bw.write("\t@RequestMapping(\"/addBatch\")");
+            bw.newLine();
+            bw.write("\tpublic ResponseVO addBatch(@RequestBody List<" + tableInfo.getBeanName() + "> listBean) {");
+            bw.newLine();
+            bw.write("\t\t" + serviceBean + ".addBatch(" + tableNameParam + "listBean);");
+            bw.newLine();
+            bw.write("\t\treturn getSuccessResponseVO(null);");
+            bw.newLine();
+            bw.write("\t}");
+            bw.newLine();
+
+            //批量新增的方法
+            BuildComment.createFieldComment(bw, "Add or Update Batch");
+            bw.newLine();
+            bw.write("\t@RequestMapping(\"/addOrUpdateBatch\")");
+            bw.newLine();
+            bw.write("\tpublic ResponseVO addOrUpdateBatch(@RequestBody List<" + tableInfo.getBeanName() + "> listBean) {");
+            bw.newLine();
+            bw.write("\t\t" + serviceBean + ".addOrUpdateBatch(" + tableNameParam + "listBean);");
+            bw.newLine();
+            bw.write("\t\treturn getSuccessResponseVO(null);");
+            bw.newLine();
+            bw.write("\t}");
+            bw.newLine();
+
+            Map<String, List<FieldInfo>> keyMap = tableInfo.getKeyIndexMap();
+            for (Map.Entry<String, List<FieldInfo>> entry : keyMap.entrySet()) {
+                List<FieldInfo> keyfieldInfoList = entry.getValue();
+                StringBuffer paramStr = new StringBuffer();
+                StringBuffer paramNameStr = new StringBuffer();
+                StringBuffer methodName = new StringBuffer();
+                int index = 0;
+                for (FieldInfo column : keyfieldInfoList) {
+                    if (index > 0) {
+                        paramStr.append(",");
+                        paramNameStr.append(",");
+                        methodName.append("And");
+                    }
+                    paramStr.append(column.getJavaType() + " " + column.getPropertyName() + "");
+                    paramNameStr.append(column.getPropertyName());
+                    methodName.append(StringTools.upperCaseFirstLetter(column.getPropertyName()));
+                    index++;
+                }
+                if (paramStr.length() > 0) {
+                    BuildComment.createFieldComment(bw, "Update Object By" + methodName);
+                    bw.newLine();
+                    String methodNameStr = "update" + tableInfo.getBeanName() + "By" + methodName.toString();
+                    bw.write("\t@RequestMapping(\"/" + methodNameStr + "\")");
+                    bw.newLine();
+                    bw.write("\tpublic ResponseVO " + methodNameStr + "(" + tableInfo.getBeanName() + " bean," + paramStr.toString() + ") {");
+                    bw.newLine();
+                    bw.write("\t\t" + serviceBean + "." + methodNameStr + "(" + tableNameParam + "bean," + paramNameStr + ");");
+                    bw.newLine();
+                    bw.write("\t\treturn getSuccessResponseVO(null);");
+                    bw.newLine();
+                    bw.write("\t}");
+                    bw.newLine();
+
+                    BuildComment.createFieldComment(bw, "Delete Object By" + methodName);
+                    bw.newLine();
+                    methodNameStr = "delete" + tableInfo.getBeanName() + "By" + methodName.toString();
+                    bw.write("\t@RequestMapping(\"/" + methodNameStr + "\")");
+                    bw.newLine();
+                    bw.write("\tpublic ResponseVO " + methodNameStr + "(" + paramStr.toString() + ") {");
+                    bw.newLine();
+                    bw.write("\t\t" + serviceBean + "." + methodNameStr + "(" + tableNameParam + paramNameStr + ");");
+                    bw.newLine();
+                    bw.write("\t\treturn getSuccessResponseVO(null);");
+                    bw.newLine();
+                    bw.write("\t}");
+                    bw.newLine();
+
+                    BuildComment.createFieldComment(bw, "Select Object By" + methodName);
+                    bw.newLine();
+                    methodNameStr = "get" + tableInfo.getBeanName() + "By" + methodName.toString();
+                    bw.write("\t@RequestMapping(\"/" + methodNameStr + "\")");
+                    bw.newLine();
+                    bw.write("\tpublic ResponseVO " + methodNameStr + "(" + paramStr.toString() + ") {");
+                    bw.newLine();
+                    bw.write("\t\treturn getSuccessResponseVO(" + serviceBean + "." + methodNameStr + "(" + tableNameParam + paramNameStr + "));");
+                    bw.newLine();
+                    bw.write("\t}");
+                    bw.newLine();
+
+                }
+            }
+            bw.write("}");
+            bw.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (null != out) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (outw != null) {
+                try {
+                    outw.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+
+                }
+            }
+            if (null != bw) {
+                try {
+                    bw.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}

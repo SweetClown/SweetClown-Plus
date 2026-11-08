@@ -1,17 +1,14 @@
 package com.sweetclown.builder;
 
-import com.alibaba.fastjson.JSON;
 import com.sweetclown.bean.Constants;
 import com.sweetclown.bean.FieldInfo;
 import com.sweetclown.bean.TableInfo;
-import com.sweetclown.utils.DateUtils;
+import com.sweetclown.utils.StringTools;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tomcat.util.bcel.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.plaf.synth.SynthScrollBarUI;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +24,7 @@ public class BuildQuery {
             folder.mkdirs();
         }
 
-        String className = tableInfo.getBeanName() +  com.sweetclown.utils.StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY);
+        String className = tableInfo.getBeanName() +  StringTools.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY);
         File queryfile = new File(folder, className + ".java");
 
         OutputStream out = null;
@@ -77,7 +74,7 @@ public class BuildQuery {
                 bw.newLine();
 
                 if (ArrayUtils.contains(Constants.SQL_STRING_TYPES, field.getSqlType())) {
-                    String propertyName = field.getPropertyName() + com.sweetclown.utils.StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_FUZZY);
+                    String propertyName = field.getPropertyName() + StringTools.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_FUZZY);
                     bw.write("\tprivate " + field.getJavaType() + " " + propertyName  + ";");
                     bw.newLine();
                     bw.newLine();
@@ -90,11 +87,11 @@ public class BuildQuery {
                 }
 
                 if (ArrayUtils.contains(Constants.SQL_DATE_TYPES, field.getSqlType()) || ArrayUtils.contains(Constants.SQL_DATE_TIME_TYPES, field.getSqlType())) {
-                    bw.write("\tprivate String " + field.getPropertyName() + com.sweetclown.utils.StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_START) + ";");
+                    bw.write("\tprivate String " + field.getPropertyName() + StringTools.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_START) + ";");
                     bw.newLine();
                     bw.newLine();
 
-                    bw.write("\tprivate String " + field.getPropertyName() + com.sweetclown.utils.StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_END) + ";");
+                    bw.write("\tprivate String " + field.getPropertyName() + StringTools.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_END) + ";");
                     bw.newLine();
                     bw.newLine();
                 }
@@ -135,7 +132,7 @@ public class BuildQuery {
 
     private static void buildGetSet(BufferedWriter bw,List<FieldInfo> fieldInfoList) throws Exception {
         for (FieldInfo field : fieldInfoList) {
-            String tempField = com.sweetclown.utils.StringUtils.upperCaseFirstLetter(field.getPropertyName());
+            String tempField = StringTools.upperCaseFirstLetter(field.getPropertyName());
             bw.write("\tpublic void set" + tempField + "(" + field.getJavaType() + " " + field.getPropertyName() + ") {");
             bw.newLine();
             bw.write("\t\tthis." + field.getPropertyName() + " = " + field.getPropertyName() + ";");

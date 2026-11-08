@@ -1,15 +1,12 @@
 package com.sweetclown.builder;
 
-import com.alibaba.fastjson.JSON;
 import com.sweetclown.bean.Constants;
 import com.sweetclown.bean.FieldInfo;
 import com.sweetclown.bean.TableInfo;
-import com.sweetclown.utils.StringUtils;
+import com.sweetclown.utils.StringTools;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.tomcat.util.bcel.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
 
 import java.io.*;
 import java.util.HashMap;
@@ -39,7 +36,7 @@ public class BuildMapperXML {
             folder.mkdirs();
         }
 
-        String className = tableInfo.getBeanName() + com.sweetclown.utils.StringUtils.upperCaseFirstLetter(Constants.SUFFIX_MAPPER);
+        String className = tableInfo.getBeanName() + StringTools.upperCaseFirstLetter(Constants.SUFFIX_MAPPER);
 
         File mapperFile = new File(folder, className + ".xml");
 
@@ -196,9 +193,9 @@ public class BuildMapperXML {
             if (ArrayUtils.contains(Constants.SQL_STRING_TYPES, field.getSqlType())) {
                 andWhere = "and  " + field.getFieldName() + " like concat('%', #{query." + field.getPropertyName() + "}, \'%\')";
             } else if (ArrayUtils.contains(Constants.SQL_DATE_TYPES, field.getSqlType()) || ArrayUtils.contains(Constants.SQL_DATE_TIME_TYPES, field.getSqlType())) {
-                if (field.getPropertyName().endsWith(StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_START))) {
+                if (field.getPropertyName().endsWith(StringTools.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_START))) {
                     andWhere = "<![CDATA[ and " + field.getFieldName()  + ">=str_to_date(#{query." + field.getPropertyName() + "}, '%Y-%m-%d') ]]>";
-                } else if (field.getPropertyName().endsWith(StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_END))) {
+                } else if (field.getPropertyName().endsWith(StringTools.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_END))) {
                     andWhere = "<![CDATA[ and " + field.getFieldName()  + "< date_sub(str_to_date(#{query." + field.getPropertyName() + "},'%Y-%m-%d'),interval -1 day) ]]>";
                 }
             }
@@ -237,7 +234,7 @@ public class BuildMapperXML {
         //selectNumber Generation
         bw.write("\t<!--" + selectCount + "-->");
         bw.newLine();
-        bw.write("\t<select id=\"" + selectCount + "\" resultType=\"java.lang.Long\" >");
+        bw.write("\t<select id=\"" + selectCount + "\" resultType=\"java.lang.Integer\" >");
         bw.newLine();
         bw.write("\t\tSELECT count(1) FROM "+ tableInfo.getTableName() + " <include refid=\""+ query_condition + "\" />");
         bw.newLine();
@@ -456,7 +453,7 @@ public class BuildMapperXML {
 
         bw.write("\t<!--" + updateByParam + "-->");
         bw.newLine();
-        bw.write("\t<update id=\"" + updateByParam + "\" parameterType=\"" + Constants.PACKAGE_QUERY + "." + tableInfo.getBeanName() + StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY) + "\">");
+        bw.write("\t<update id=\"" + updateByParam + "\" parameterType=\"" + Constants.PACKAGE_QUERY + "." + tableInfo.getBeanName() + StringTools.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY) + "\">");
         bw.newLine();
         bw.write("\t\tUPDATE " + tableInfo.getTableName());
         bw.newLine();
@@ -494,7 +491,7 @@ public class BuildMapperXML {
 
             for (FieldInfo fieldInfo : keyFieldInfoList) {
                 index++;
-                methodName.append(StringUtils.upperCaseFirstLetter(fieldInfo.getPropertyName()));
+                methodName.append(StringTools.upperCaseFirstLetter(fieldInfo.getPropertyName()));
                 paramsName.append(fieldInfo.getFieldName() + " =#{" + fieldInfo.getPropertyName() + "}");
                 if (index < keyFieldInfoList.size()) {
                     methodName.append("And");

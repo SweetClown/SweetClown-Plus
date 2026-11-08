@@ -4,42 +4,42 @@ import java.util.List;
 public interface BaseMapper<T, P> {
 
     /**
-     * selectList:(根據參數查詢資料列表)
+     * selectList: Query data list based on parameters
      */
     List<T> selectList(@Param("query") P p);
 
     /**
-     * selectCount:(根據參數查詢資料筆數)
+     * selectCount: Query data count based on parameters
      */
-    Long selectCount(@Param("query") P p);
+    Integer selectCount(@Param("query") P p);
 
     /**
-     * insert:(新增)
+     * insert: Insert a new record
      */
-    Long insert(@Param("bean") T t);
+    Integer insert(@Param("bean") T t);
 
     /**
-     * insertOrUpdate:(新增或更新)
+     * insertOrUpdate: Insert or update a record
      */
-    Long insertOrUpdate(@Param("bean") T t);
+    Integer insertOrUpdate(@Param("bean") T t);
 
     /**
-     * insertBatch:(批次新增)
+     * insertBatch: Batch insert records
      */
-    Long insertBatch(@Param("list") List<T> list);
+    Integer insertBatch(@Param("list") List<T> list);
 
     /**
-     * insertOrUpdateBatch:(批次新增或更新)
+     * insertOrUpdateBatch: Batch insert or update records
      */
-    Long insertOrUpdateBatch(@Param("list") List<T> list);
+    Integer insertOrUpdateBatch(@Param("list") List<T> list);
 
     /**
-     * updateByParams:(多條件更新)
+     * updateByParam: Update records based on multiple conditions
      */
-    Long updateByParam(@Param("bean") T t, @Param("query") P p);
+    Integer updateByParam(@Param("bean") T t, @Param("query") P p);
 
     /**
-     * deleteByParam:(多條件刪除)
+     * deleteByParam: Delete records based on multiple conditions
      */
-    Long deleteByParam(@Param("query") P p);
+    Integer deleteByParam(@Param("query") P p);
 }

@@ -3,7 +3,7 @@ package com.sweetclown.builder;
 import com.sweetclown.bean.Constants;
 import com.sweetclown.bean.FieldInfo;
 import com.sweetclown.bean.TableInfo;
-import com.sweetclown.utils.StringUtils;
+import com.sweetclown.utils.StringTools;
 import com.sweetclown.utils.YamlConfigUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
@@ -57,7 +57,7 @@ public class BuildTable {
                 tableInfo.setTableName(tableName);
                 tableInfo.setBeanName(beanName);
                 tableInfo.setComment(comment);
-                tableInfo.setBeanParamName(beanName + Constants.SUFFIX_BEAN_QUERY);
+                tableInfo.setBeanParamName(beanName + StringTools.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY));
 
                 readFieldInfo(tableInfo);
                 getKeyIndexInfo(tableInfo);
@@ -134,7 +134,7 @@ public class BuildTable {
                 if (ArrayUtils.contains(Constants.SQL_STRING_TYPES, type)) {
                     FieldInfo fuzzyField = new FieldInfo();
                     fuzzyField.setJavaType(fieldInfo.getJavaType());
-                    fuzzyField.setPropertyName(fieldInfo.getPropertyName()+ com.sweetclown.utils.StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_FUZZY));
+                    fuzzyField.setPropertyName(fieldInfo.getPropertyName()+ StringTools.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_FUZZY));
                     fuzzyField.setSqlType(type);
                     fuzzyField.setFieldName(fieldInfo.getFieldName());
                     fieldExtendList.add(fuzzyField);
@@ -145,14 +145,14 @@ public class BuildTable {
 
                     FieldInfo timeStartField = new FieldInfo();
                     timeStartField.setJavaType("String");
-                    timeStartField.setPropertyName(fieldInfo.getPropertyName() + com.sweetclown.utils.StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_START));
+                    timeStartField.setPropertyName(fieldInfo.getPropertyName() + StringTools.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_START));
                     timeStartField.setSqlType(type);
                     timeStartField.setFieldName(fieldInfo.getFieldName());
                     fieldExtendList.add(timeStartField);
 
                     FieldInfo timeEndField = new FieldInfo();
                     timeEndField.setJavaType("String");
-                    timeEndField.setPropertyName(fieldInfo.getPropertyName() + com.sweetclown.utils.StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_END));
+                    timeEndField.setPropertyName(fieldInfo.getPropertyName() + StringTools.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_END));
                     timeEndField.setSqlType(type);
                     timeEndField.setFieldName(fieldInfo.getFieldName());
                     fieldExtendList.add(timeEndField);
@@ -235,9 +235,9 @@ public class BuildTable {
     private static String processFiled(String field, Boolean upperCaseFirstLetter) {
         StringBuilder sb = new StringBuilder();
         String[] fields = field.split("_");
-        sb.append(upperCaseFirstLetter ? StringUtils.upperCaseFirstLetter(fields[0]) : fields[0]);
+        sb.append(upperCaseFirstLetter ? StringTools.upperCaseFirstLetter(fields[0]) : fields[0]);
         for (int i = 1; i < fields.length; i++) {
-            sb.append(StringUtils.upperCaseFirstLetter(fields[i]));
+            sb.append(StringTools.upperCaseFirstLetter(fields[i]));
         }
         return sb.toString();
     }
