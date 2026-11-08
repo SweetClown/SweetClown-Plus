@@ -61,10 +61,9 @@ public class BuildMapper {
                     if (index < keyFieldInfoList.size()) {
                         methodName.append("And");
                     }
-
                     methodParams.append("@Param(\""+fieldInfo.getPropertyName()+"\") " + fieldInfo.getJavaType()+" " +fieldInfo.getPropertyName());
                     if (index < keyFieldInfoList.size()) {
-                        methodName.append(" ,");
+                        methodParams.append(", ");
                     }
                 }
                 BuildComment.createFieldComment(bw, "根據" + methodName + "更新");
