@@ -6,10 +6,13 @@ import com.sweetclown.bean.FieldInfo;
 import com.sweetclown.bean.TableInfo;
 import com.sweetclown.utils.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.tomcat.util.bcel.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +25,12 @@ public class BuildMapperXML {
     static String base_condition_filed = "base_condition_filed";
     static String query_condition = "query_condition";
     static String selectList = "selectList";
-    static String selectNumber = "selectNumber";
+    static String selectCount = "selectCount";
+    static String insert = "insert";
+    static String insertOrUpdate = "insertOrUpdate";
+    static String insertBatch = "insertBatch";
+    static String insertOrUpdateBatch = "insertOrUpdateBatch";
+    static String updateByParam = "updateByParam";
 
     public static void execute(TableInfo tableInfo) {
 
@@ -76,7 +84,7 @@ public class BuildMapperXML {
                 bw.write("\t\t<!--" + fieldInfo.getComment() + "-->");
                 bw.newLine();
                 String key = "";
-                if (idField != null & fieldInfo.getPropertyName().equals(idField.getPropertyName())) {
+                if (idField != null && fieldInfo.getPropertyName().equals(idField.getPropertyName())) {
                     key = "id";
                 } else {
                     key = "result";
@@ -91,7 +99,13 @@ public class BuildMapperXML {
             baseConditionFiledGenerator(bw, tableInfo);
             queryCondition(bw, tableInfo);
             selectList(bw, tableInfo);
-            selectNumber(bw, tableInfo);
+            selectCount(bw, tableInfo);
+            insert(bw, tableInfo);
+            insertOrUpdated(bw, tableInfo);
+            insertBatch(bw,tableInfo);
+            insertOrUpdateBatch(bw, tableInfo);
+            updateByParam(bw,tableInfo);
+            queryByPrimaryKey(bw, tableInfo);
             bw.write("</mapper>");
             bw.newLine();
 
@@ -183,9 +197,9 @@ public class BuildMapperXML {
                 andWhere = "and  " + field.getFieldName() + " like concat('%', #{query." + field.getPropertyName() + "}, \'%\')";
             } else if (ArrayUtils.contains(Constants.SQL_DATE_TYPES, field.getSqlType()) || ArrayUtils.contains(Constants.SQL_DATE_TIME_TYPES, field.getSqlType())) {
                 if (field.getPropertyName().endsWith(StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_START))) {
-                    andWhere = "<![CDATA[ and " + field.getFieldName() + ">=str_to_date(#{query." + field.getPropertyName() + "}, '%Y-%m-%d') ]]>";
+                    andWhere = "<![CDATA[ and " + field.getFieldName()  + ">=str_to_date(#{query." + field.getPropertyName() + "}, '%Y-%m-%d') ]]>";
                 } else if (field.getPropertyName().endsWith(StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_END))) {
-                    andWhere = "<![CDATA[ and " + field.getFieldName() + "< date_sub(str_to_date(#{query." + field.getPropertyName() + "},'%Y-%m-%d'),interval -1 day) ]]>";
+                    andWhere = "<![CDATA[ and " + field.getFieldName()  + "< date_sub(str_to_date(#{query." + field.getPropertyName() + "},'%Y-%m-%d'),interval -1 day) ]]>";
                 }
             }
             bw.write("\t\t\t<if test=\"query." + field.getPropertyName() + " != null and query." + field.getPropertyName() + "!=\'\'\">");
@@ -219,11 +233,11 @@ public class BuildMapperXML {
         bw.newLine();
     }
 
-    private static void selectNumber(BufferedWriter bw, TableInfo tableInfo) throws IOException {
+    private static void selectCount(BufferedWriter bw, TableInfo tableInfo) throws IOException {
         //selectNumber Generation
-        bw.write("\t<!--" + selectNumber + "-->");
+        bw.write("\t<!--" + selectCount + "-->");
         bw.newLine();
-        bw.write("\t<select id=\"" + selectNumber + "\" resultType=\"java.lang.Long\" >");
+        bw.write("\t<select id=\"" + selectCount + "\" resultType=\"java.lang.Long\" >");
         bw.newLine();
         bw.write("\t\tSELECT count(1) FROM "+ tableInfo.getTableName() + " <include refid=\""+ query_condition + "\" />");
         bw.newLine();
@@ -232,6 +246,304 @@ public class BuildMapperXML {
         bw.newLine();
     }
 
+    private static void insert(BufferedWriter bw, TableInfo tableInfo) throws IOException {
+        //Insert Generation
+        FieldInfo autoIncrementField = null;
+        for (FieldInfo field : tableInfo.getFieldList()) {
+            if (field.getAutoIncrement() != null && field.getAutoIncrement()) {
+                autoIncrementField = field;
+                break;
+            }
+        }
+//        String trimPrefix = "<trim prefix=\"(\" "
+        bw.write("\t<!--" + insert + "(Match fields that have a value)-->");
+        bw.newLine();
+        bw.write("\t<insert id=\"" + insert + "\" parameterType=\"" + Constants.PACKAGE_PO + "." + tableInfo.getBeanName() + "\">");
+        bw.newLine();
+        if (autoIncrementField != null) {
+            bw.write("\t\t<selectKey keyProperty=\"bean." + autoIncrementField.getFieldName() + "\" resultType=\"" + autoIncrementField.getJavaType() +  "\" order=\"AFTER\">");
+            bw.newLine();
+            bw.write("\t\t\tSELECT LAST_INSERT_ID()");
+            bw.newLine();
+            bw.write("\t\t</selectKey>");
+            bw.newLine();
+        }
+        bw.write("\t\tInsert INTO " + tableInfo.getTableName());
+        bw.newLine();
+        bw.write("\t\t<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\" >");
+        bw.newLine();
+        for (FieldInfo field : tableInfo.getFieldList()) {
+            bw.write("\t\t\t<if test=\"bean." + field.getPropertyName() + "!= null\">");
+            bw.newLine();
+            bw.write("\t\t\t\t" + field.getFieldName() +",");
+            bw.newLine();
+            bw.write("\t\t\t</if>");
+            bw.newLine();
+        }
+        bw.write("\t\t</trim>");
+        bw.newLine();
+        bw.write("\t\t<trim prefix=\"values(\" suffix=\")\" suffixOverrides=\",\" >");
+        bw.newLine();
+        for (FieldInfo field : tableInfo.getFieldList()) {
+            bw.write("\t\t\t<if test=\"bean." + field.getPropertyName() + "!= null\">");
+            bw.newLine();
+            bw.write("\t\t\t\t#{bean." + field.getPropertyName() + "},");
+            bw.newLine();
+            bw.write("\t\t\t</if>");
+            bw.newLine();
+        }
+        bw.write("\t\t</trim>");
+        bw.newLine();
+        bw.write("\t</insert>");
+        bw.newLine();
+    }
 
+    private static void insertOrUpdated(BufferedWriter bw, TableInfo tableInfo) throws IOException {
+        //Insert or Updated Generation
+
+        bw.write("\t<!--" + insertOrUpdate + "(Match fields that have a value)-->");
+        bw.newLine();
+        bw.write("\t<insert id=\"" + insertOrUpdate + "\" parameterType=\"" + Constants.PACKAGE_PO + "." + tableInfo.getBeanName() + "\">");
+        bw.newLine();
+        bw.write("\t\tInsert INTO " + tableInfo.getTableName());
+        bw.newLine();
+        bw.write("\t\t<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\" >");
+        bw.newLine();
+        for (FieldInfo field : tableInfo.getFieldList()) {
+            bw.write("\t\t\t<if test=\"bean." + field.getPropertyName() + "!= null\">");
+            bw.newLine();
+            bw.write("\t\t\t\t" + field.getFieldName() +",");
+            bw.newLine();
+            bw.write("\t\t\t</if>");
+            bw.newLine();
+        }
+        bw.write("\t\t</trim>");
+        bw.newLine();
+        bw.write("\t\t<trim prefix=\"values(\" suffix=\")\" suffixOverrides=\",\" >");
+        bw.newLine();
+        for (FieldInfo field : tableInfo.getFieldList()) {
+            bw.write("\t\t\t<if test=\"bean." + field.getPropertyName() + "!= null\">");
+            bw.newLine();
+            bw.write("\t\t\t\t#{bean." + field.getPropertyName() + "},");
+            bw.newLine();
+            bw.write("\t\t\t</if>");
+            bw.newLine();
+        }
+        bw.write("\t\t</trim>");
+        bw.newLine();
+        bw.write("\t\ton DUPLICATE key update");
+        bw.newLine();
+        Map<String, String> keyTempMap = new HashMap();
+        Map<String, List<FieldInfo>> keyIndexMap = tableInfo.getKeyIndexMap();
+        for (Map.Entry<String, List<FieldInfo>> entry : keyIndexMap.entrySet()) {
+            if ("PRIMARY".equals(entry.getKey())) {
+                List<FieldInfo> fieldInfoList = entry.getValue();
+                for (FieldInfo item : fieldInfoList) {
+                    keyTempMap.put(item.getFieldName(), item.getFieldName());
+                }
+            }
+        }
+        bw.write("\t\t<trim prefix=\"\" suffix=\"\" suffixOverrides=\",\">");
+        bw.newLine();
+        for (FieldInfo field : tableInfo.getFieldList()) {
+            if (keyTempMap.get(field.getFieldName()) != null) {
+                continue;
+            }
+            bw.write("\t\t\t<if test=\"bean." + field.getPropertyName() + "!= null\">");
+            bw.newLine();
+            bw.write("\t\t\t\t" + field.getFieldName() + " = VALUES(" + field.getFieldName() + "),");
+            bw.newLine();
+            bw.write("\t\t\t</if>");
+            bw.newLine();
+        }
+        bw.write("\t\t</trim>");
+        bw.newLine();
+        bw.write("\t</insert>");
+        bw.newLine();
+        bw.newLine();
+    }
+
+    private static void insertBatch(BufferedWriter bw, TableInfo tableInfo) throws IOException {
+        //insertBatch Generation
+
+        StringBuilder columnBuilder = new StringBuilder();
+        StringBuilder valueBuilder = new StringBuilder();
+
+        for (FieldInfo field : tableInfo.getFieldList()) {
+            if (field.getAutoIncrement() != null && field.getAutoIncrement()) {
+                continue; // Use continue, not break!
+            }
+            columnBuilder.append("\t\t\t").append(field.getFieldName()).append(",\n");
+            valueBuilder.append("\t\t\t\t#{item.").append(field.getPropertyName()).append("},\n");
+        }
+        columnBuilder = new StringBuilder(columnBuilder.substring(0, columnBuilder.lastIndexOf(",")));
+        valueBuilder = new StringBuilder(valueBuilder.substring(0, valueBuilder.lastIndexOf(",")));
+        bw.write("\t<!--" + insertBatch + "-->");
+        bw.newLine();
+        bw.write("\t<insert id=\"" + insertBatch + "\" parameterType=\"" + Constants.PACKAGE_PO + "." + tableInfo.getBeanName() + "\">");
+        bw.newLine();
+        bw.write("\t\tINSERT INTO " + tableInfo.getTableName() +"(");
+        bw.newLine();
+        bw.write(String.valueOf(columnBuilder));
+        bw.newLine();
+        bw.write("\t\t)values");
+        bw.newLine();
+        bw.write("\t\t<foreach collection=\"list\" item=\"item\" separator=\",\">");
+        bw.newLine();
+        bw.write("\t\t\t(");
+        bw.newLine();
+        bw.write(String.valueOf(valueBuilder));
+        bw.newLine();
+        bw.write("\t\t\t)");
+        bw.newLine();
+        bw.write("\t\t</foreach>");
+        bw.newLine();
+        bw.write("\t</insert>");
+        bw.newLine();
+        bw.newLine();
+    }
+
+    private static void insertOrUpdateBatch(BufferedWriter bw, TableInfo tableInfo) throws IOException {
+        //insertBatch Generation
+
+        StringBuilder columnBuilder = new StringBuilder();
+        StringBuilder valueBuilder = new StringBuilder();
+        StringBuilder duplicateBuilder = new StringBuilder();
+
+        for (FieldInfo field : tableInfo.getFieldList()) {
+            if (field.getAutoIncrement() != null && field.getAutoIncrement()) {
+                continue; // Use continue, not break!
+            }
+            columnBuilder.append("\t\t\t").append(field.getFieldName()).append(",\n");
+            valueBuilder.append("\t\t\t\t#{item.").append(field.getPropertyName()).append("},\n");
+            duplicateBuilder.append("\t\t\t"+ field.getFieldName() + " = VALUES(" + field.getFieldName() + "),\n");
+        }
+        columnBuilder = new StringBuilder(columnBuilder.substring(0, columnBuilder.lastIndexOf(",")));
+        valueBuilder = new StringBuilder(valueBuilder.substring(0, valueBuilder.lastIndexOf(",")));
+        duplicateBuilder = new StringBuilder(duplicateBuilder.substring(0, duplicateBuilder.lastIndexOf(",")));
+        bw.write("\t<!--" + insertOrUpdateBatch + "-->");
+        bw.newLine();
+        bw.write("\t<insert id=\"" + insertOrUpdateBatch + "\" parameterType=\"" + Constants.PACKAGE_PO + "." + tableInfo.getBeanName() + "\">");
+        bw.newLine();
+        bw.write("\t\tINSERT INTO " + tableInfo.getTableName() +"(");
+        bw.newLine();
+        bw.write(String.valueOf(columnBuilder));
+        bw.newLine();
+        bw.write("\t\t)values");
+        bw.newLine();
+        bw.write("\t\t<foreach collection=\"list\" item=\"item\" separator=\",\">");
+        bw.newLine();
+        bw.write("\t\t\t(");
+        bw.newLine();
+        bw.write(String.valueOf(valueBuilder));
+        bw.newLine();
+        bw.write("\t\t\t)");
+        bw.newLine();
+        bw.write("\t\t</foreach>");
+        bw.newLine();
+        bw.write("\t\ton DUPLICATE Key update");
+        bw.newLine();
+        bw.write(String.valueOf(duplicateBuilder));
+        bw.newLine();
+        bw.write("\t</insert>");
+        bw.newLine();
+        bw.newLine();
+    }
+
+    private static void updateByParam(BufferedWriter bw, TableInfo tableInfo) throws IOException {
+        //updateByParam Generation
+
+
+        bw.write("\t<!--" + updateByParam + "-->");
+        bw.newLine();
+        bw.write("\t<update id=\"" + updateByParam + "\" parameterType=\"" + Constants.PACKAGE_QUERY + "." + tableInfo.getBeanName() + StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY) + "\">");
+        bw.newLine();
+        bw.write("\t\tUPDATE " + tableInfo.getTableName());
+        bw.newLine();
+        bw.write("\t\t<set>");
+        bw.newLine();
+        for (FieldInfo field : tableInfo.getFieldList()){
+            if (field.getAutoIncrement() != null && field.getAutoIncrement()) {
+                continue; // Use continue, not break!
+            }
+            bw.write("\t\t\t<if test=\"bean." + field.getPropertyName() + " != null\">");
+            bw.newLine();
+            bw.write("\t\t\t\t" + field.getFieldName() + "= #{bean." + field.getPropertyName() + "},");
+            bw.newLine();
+            bw.write("\t\t\t</if>");
+            bw.newLine();
+        }
+        bw.write("\t\t</set>");
+        bw.newLine();
+        bw.write("\t\t<include refid=\""+ query_condition + "\" />");
+        bw.newLine();
+        bw.write("\t</update>");
+        bw.newLine();
+        bw.newLine();
+    }
+
+    private static void queryByPrimaryKey(BufferedWriter bw, TableInfo tableInfo) throws IOException {
+
+        Map<String, List<FieldInfo>> keyIndexMap = tableInfo.getKeyIndexMap();
+        for (Map.Entry<String, List<FieldInfo>> entry : keyIndexMap.entrySet()) {
+            List<FieldInfo> keyFieldInfoList = entry.getValue();
+            Integer index = 0;
+            StringBuilder methodName = new StringBuilder();
+
+            StringBuilder paramsName = new StringBuilder();
+
+            for (FieldInfo fieldInfo : keyFieldInfoList) {
+                index++;
+                methodName.append(StringUtils.upperCaseFirstLetter(fieldInfo.getPropertyName()));
+                paramsName.append(fieldInfo.getFieldName() + " =#{" + fieldInfo.getPropertyName() + "}");
+                if (index < keyFieldInfoList.size()) {
+                    methodName.append("And");
+                    paramsName.append(" and ");
+                }
+
+            }
+            bw.write("\t<!--根據" + methodName + "獲取對象-->");
+            bw.newLine();
+            bw.write("\t<select id=\"selectBy" + methodName+ "\" resultMap=\"" + base_result_map + "\" >");
+            bw.newLine();
+            bw.write("\t\tselect <include refid=\"" + base_Column_List + "\" /> from " + tableInfo.getTableName() + " where " + paramsName);
+            bw.newLine();
+            bw.write("\t</select>");
+            bw.newLine();
+            bw.newLine();
+            bw.write("\t<!--根據" + methodName + "更新-->");
+            bw.newLine();
+            bw.write("\t<update id=\"updateBy" + methodName + "\" parameterType=\"" + Constants.PACKAGE_PO + "." + tableInfo.getBeanName() + "\">");
+            bw.newLine();
+            bw.write("\t\tUPDATE " + tableInfo.getTableName());
+            bw.newLine();
+            bw.write("\t\t<set>");
+            bw.newLine();
+            for (FieldInfo field : tableInfo.getFieldList()) {
+                bw.write("\t\t\t<if test=\"bean."+ field.getPropertyName() + " != null\">");
+                bw.newLine();
+                bw.write("\t\t\t\t" + field.getFieldName() + " =#{bean." + field.getPropertyName() + "},");
+                bw.newLine();
+                bw.write("\t\t\t</if>");
+                bw.newLine();
+            }
+            bw.write("\t\t</set>");
+            bw.newLine();
+            bw.write("\t\t\twhere " + paramsName);
+            bw.newLine();
+            bw.write("\t</update>");
+            bw.newLine();
+            bw.newLine();
+            bw.write("\t<!--根據" + methodName + "删除-->");
+            bw.newLine();
+            bw.write("\t<delete id=\"deleteBy" + methodName +"\" >");
+            bw.newLine();
+            bw.write("\t\tdelete from " + tableInfo.getTableName() + " where " + paramsName);
+            bw.newLine();
+            bw.write("\t</delete>");
+            bw.newLine();
+            bw.newLine();
+        }
+    }
 
 }
