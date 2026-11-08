@@ -136,6 +136,7 @@ public class BuildTable {
                     fuzzyField.setJavaType(fieldInfo.getJavaType());
                     fuzzyField.setPropertyName(fieldInfo.getPropertyName()+ com.sweetclown.utils.StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_FUZZY));
                     fuzzyField.setSqlType(type);
+                    fuzzyField.setFieldName(fieldInfo.getFieldName());
                     fieldExtendList.add(fuzzyField);
                 }
 
@@ -145,15 +146,15 @@ public class BuildTable {
                     FieldInfo timeStartField = new FieldInfo();
                     timeStartField.setJavaType("String");
                     timeStartField.setPropertyName(fieldInfo.getPropertyName() + com.sweetclown.utils.StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_START));
-                    timeStartField.setFieldName(fieldInfo.getPropertyName());
                     timeStartField.setSqlType(type);
+                    timeStartField.setFieldName(fieldInfo.getFieldName());
                     fieldExtendList.add(timeStartField);
 
                     FieldInfo timeEndField = new FieldInfo();
                     timeEndField.setJavaType("String");
                     timeEndField.setPropertyName(fieldInfo.getPropertyName() + com.sweetclown.utils.StringUtils.upperCaseFirstLetter(Constants.SUFFIX_BEAN_QUERY_END));
-                    timeEndField.setFieldName(fieldInfo.getPropertyName());
                     timeEndField.setSqlType(type);
+                    timeEndField.setFieldName(fieldInfo.getFieldName());
                     fieldExtendList.add(timeEndField);
 
                 }
